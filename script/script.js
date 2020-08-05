@@ -32,7 +32,7 @@ function formSubmitHandler (evt) {
   evt.preventDefault(); // Эта строчка отменяет стандартную отправку формы.
   profileTitle.textContent = popupTitle.value;
   profileDescription.textContent = popupDescription.value;
-  closePopup();
+  popupClose();
 };
 
 popupOpenBotton.addEventListener('click', popupOpen);
