@@ -1,5 +1,5 @@
 .element__like {
-    background-image: url(/images/Like-Button.svg);
+    background-image: url(../../../images/Like-Button.svg);
     min-width: 21px;
     height: 18px;
     background-color: transparent;
