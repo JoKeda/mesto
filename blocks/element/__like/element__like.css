@@ -8,4 +8,9 @@
     cursor: pointer;
     margin-top: 31px;
     margin-right: 18px;
+    transition: opacity 1s ease-in-out;
 }
+
+.element__like:hover {
+    opacity: 0.6;
+  }

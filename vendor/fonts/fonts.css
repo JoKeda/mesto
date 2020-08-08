@@ -21,3 +21,11 @@
     font-weight: 900;
     font-style: normal;
 }
+
+@font-face {
+    src: url("./Inter-Medium.woff2") format("woff2"),
+         url("./Inter-Medium.woff") format("woff");
+    font-family: 'inter';
+    font-weight: 500;
+    font-style: normal;
+}

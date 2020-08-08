@@ -10,7 +10,7 @@ let popupOpenBotton = document.querySelector('.profile__edit-button');
 /*popup*/
 let popup = document.querySelector('.popup');
 
-let formElement = document.querySelector('.popup__container');
+let formElement = document.querySelector('.popup__form');
 
 let popupTitle = popup.querySelector('.popup__input_title');
 
@@ -38,8 +38,3 @@ function formSubmitHandler (evt) {
 popupOpenBotton.addEventListener('click', popupOpen);
 popupCloseButton.addEventListener('click', popupClose);
 formElement.addEventListener('submit', formSubmitHandler);
-
-
-/* let popupToggle = function () {
-    popup.classList.toggle('popup_opened');
-}; */
