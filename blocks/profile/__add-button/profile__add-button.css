@@ -20,5 +20,6 @@
         background-repeat: no-repeat;
         margin: 30px auto 0;
         width: 100%;
+        max-width: 282px;
     }
     }
