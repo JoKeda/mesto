@@ -4,10 +4,10 @@
 @import url(./__botton/popup__botton.css);
 @import url(./__form/popup__form.css);
 @import url(./__close/popup__close.css);
-
+@import url(./__image-description/popup__image-description.css);
 
 .popup {
-    display: none;
+    display: none; 
     position: fixed;
     background-color: rgba(0, 0, 0, 0.5);
     top: 0;
