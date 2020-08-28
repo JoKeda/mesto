@@ -52,6 +52,7 @@ const popupImageDescription = popupImage.querySelector('.popup__image-descriptio
 const popupImageClose = popupImage.querySelector('.popup__close_image');
 
 const elements = document.querySelector('.elements');
+const elementTemplate = document.querySelector('#element-template').content;
 
 /*попапы вкл выкл*/
 
@@ -78,20 +79,9 @@ function saveProfile (evt) {
   closePopup(popupProfile);
 }
 
-/* объявление Element */
-
-function addInitialCards() {
-  initialCards.forEach( item => {
-    const template = addTemplate(item.name, item.link);
-    elements.append(template);
-  });
-}
-
 /* добавить шаблон */
 
 function addTemplate(elementTitle, elementImage) {
-   const elementTemplate = document.querySelector('#element-template').content;
-
    const template = elementTemplate.cloneNode(true);
 
    const templateTitle = template.querySelector('.element__title');
@@ -110,6 +100,15 @@ function addTemplate(elementTitle, elementImage) {
    likeButton.addEventListener('click', likeImage);
 
    return template;
+}
+
+/* объявление Element */
+
+function addInitialCards() {
+  initialCards.forEach( item => {
+    const template = addTemplate(item.name, item.link);
+    elements.append(template);
+  });
 }
 
 function addElement(elementTitle, elementImage) {
