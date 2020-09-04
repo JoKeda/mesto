@@ -55,17 +55,32 @@ const elements = document.querySelector('.elements');
 const elementTemplate = document.querySelector('#element-template').content;
 
 /*попапы вкл выкл*/
-
 function openPopup(evt) {
   evt.classList.add('popup_opened');
+  addEventListener('keydown', closeEscape);
+  evt.addEventListener('click', closeOverlay);
 }
 
 function closePopup(evt) {
   evt.classList.remove('popup_opened');
 }
 
-/*попап профиля*/
+/*Escape*/
+function closeEscape(evt) {
+  if (evt.key === "Escape") {
+    const popupOpened = document.querySelector('.popup_opened');
+    closePopup(popupOpened);
+  }
+}
 
+/*Overlay*/
+function closeOverlay(evt) {
+  if (evt.target === evt.currentTarget) {
+      closePopup(evt.target);
+  }
+}
+
+/*попап профиля*/
 function openPopupProfile() {
   popupTitle.value = profileTitle.textContent;
   popupDescription.value = profileDescription.textContent;
@@ -79,8 +94,9 @@ function saveProfile (evt) {
   closePopup(popupProfile);
 }
 
-/* добавить шаблон */
 
+
+/* добавить шаблон */
 function addTemplate(elementTitle, elementImage) {
    const template = elementTemplate.cloneNode(true);
 
@@ -103,7 +119,6 @@ function addTemplate(elementTitle, elementImage) {
 }
 
 /* объявление Element */
-
 function addInitialCards() {
   initialCards.forEach( item => {
     const template = addTemplate(item.name, item.link);
@@ -143,9 +158,7 @@ function likeImage(evt) {
 function openPopupImage(evt) {
   popupImageItem.src = evt.target.src;
   popupImageItem.alt = evt.target.alt;
-
   popupImageDescription.textContent = evt.target.alt;
-
   openPopup(popupImage);
 }
 

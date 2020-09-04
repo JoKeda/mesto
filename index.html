@@ -28,8 +28,10 @@
     <div class="popup popup__profile">
         <form class="popup__form" name="popup__form">
             <h3 class="popup__title">Редактировать профиль</h3>
-            <input class="popup__input popup__input_element_title" type="text" name="title">
-            <input class="popup__input popup__input_element_description" type="text" name="description">
+            <input class="popup__input popup__input_element_title" type="text" name="title" placeholder="Имя" minlength="2" maxlength="40" required>
+            <span class="popup__error" id="error-title"></span>
+            <input class="popup__input popup__input_element_description" type="text" name="description" placeholder="О себе" minlength="2" maxlength="200" required>
+            <span class="popup__error" id="error-description"></span>
             <button class="popup__botton" type="submit">Сохранить</button>
             <button class="popup__close" type="button"></button>
         </form>
@@ -38,8 +40,10 @@
     <div class="popup popup__element">
         <form class="popup__form" name="popup__form">
             <h3 class="popup__title">Новое место</h3>
-            <input class="popup__input popup__input_element_element-title" type="text" name="element-title" placeholder="Название">
-            <input class="popup__input popup__input_element_img" type="text" name="element-img" placeholder="Ссылка на картинку">
+            <input class="popup__input popup__input_element_element-title" type="text" name="element-title" placeholder="Название" minlength="1" maxlength="30" required>
+            <span class="popup__error" id="error-element-title"></span>
+            <input class="popup__input popup__input_element_img" type="url" name="element-img" placeholder="Ссылка на картинку" required>
+            <span class="popup__error" id="error-img"></span>
             <button class="popup__botton" type="submit">Сохранить</button>
             <button class="popup__close" type="button"></button>
         </form>        
@@ -70,6 +74,7 @@
     </template>
 
 <script src="script/script.js"></script>
+<script src="./script/validate.js"></script>
 
 </body>
 </html>
