@@ -168,11 +168,17 @@ function likeImage(evt) {
 }
 
 function popupImageHandler(evt) {
+  console.log('popupImageHandler');
+  console.log(evt.target.src);
+  console.log(evt.target.alt);
   openPopupImage(evt.target.src, evt.target.alt);
 }
 
 /*создать открытие попапа с картинкой*/
 function openPopupImage(src, alt) {
+  console.log('openPopupImage');
+  console.log(src);
+  console.log(alt);
   popupImageItem.src = src;
   popupImageItem.alt = alt;
   popupImageDescription.textContent = alt;
