@@ -1,4 +1,4 @@
-const custom = {
+ const custom = {
     formSelector: '.popup__form',
     inputSelector: '.popup__input',
     submitButtonSelector: '.popup__botton',
@@ -66,4 +66,4 @@ const custom = {
     });
   };
 
-  enableValidation(custom);
+  enableValidation(custom); 

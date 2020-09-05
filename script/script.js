@@ -63,6 +63,19 @@ function openPopup(evt) {
 
 function closePopup(evt) {
   evt.classList.remove('popup_opened');
+  document.removeEventListener('keydown', closeEscape);
+  clearPopupForm(evt);
+}
+
+function clearPopupForm(evt) {
+  if (evt.classList.contains('popup__element')) {
+      evt.querySelectorAll('.popup__input').forEach(input => {
+          input.value = '';
+      });
+  }
+
+  evt.querySelector('.popup__botton').classList.add('popup__botton_disabled');
+  evt.querySelector('.popup__botton').disabled = true;
 }
 
 /*Escape*/
@@ -154,13 +167,18 @@ function likeImage(evt) {
   like.classList.toggle('element__like_active');
 }
 
+function popupImageHandler(evt) {
+  openPopupImage(evt.target.src, evt.target.alt);
+}
+
 /*создать открытие попапа с картинкой*/
-function openPopupImage(evt) {
-  popupImageItem.src = evt.target.src;
-  popupImageItem.alt = evt.target.alt;
-  popupImageDescription.textContent = evt.target.alt;
+function openPopupImage(src, alt) {
+  popupImageItem.src = src;
+  popupImageItem.alt = alt;
+  popupImageDescription.textContent = alt;
   openPopup(popupImage);
 }
+
 
 popupCloseEdit.addEventListener('click', () => {closePopup(popupProfile);});
 popupEdit.addEventListener('click', openPopupProfile);
