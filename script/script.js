@@ -66,6 +66,7 @@ function closePopup(evt) {
   if (evt.classList.contains('popup__element') || evt.classList.contains('popup__profile')) {
       clearPopupForm(evt);
   }
+  removeEventListener('keydown', closeEscape);
 }
 
 
