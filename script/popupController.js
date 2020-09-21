@@ -1,6 +1,6 @@
 function openPopup(evt) {
     evt.classList.add('popup_opened');
-    addEventListener('keydown', closeEscape);
+    document.addEventListener('keydown', closeEscape);
     evt.addEventListener('click', closeOverlay);
 }
 
@@ -9,7 +9,6 @@ function closePopup(evt) {
     if (evt.classList.contains('popup__element') || evt.classList.contains('popup__profile')) {
         clearPopupForm(evt);
     }
-    removeEventListener('keydown', closeEscape);
 }
 
 function clearPopupForm(evt) {

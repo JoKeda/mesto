@@ -26,11 +26,10 @@ export class Card {
     };
 
     _deleteCard = () => {
-        this._removeEventListener();
         this._element.remove();
         this._element = null;
     };
-
+s
     _likeCard = () => {
         this._element.querySelector('.element__like').classList.toggle('element__like_active');
     };
@@ -45,9 +44,4 @@ export class Card {
         this._element.querySelector('.element__image').addEventListener('click', this._openPopup);
     };
 
-    _removeEventListener = () => {
-        this._element.querySelector('.element__delete').removeEventListener('click', this._deleteCard);
-        this._element.querySelector('.element__like').removeEventListener('click', this._likeCard);
-        this._element.querySelector('.element__image').removeEventListener('click', this._openPopup);
-    };
 }
