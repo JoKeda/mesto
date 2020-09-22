@@ -1,25 +1,26 @@
-function openPopup(evt) {
-    evt.classList.add('popup_opened');
+function openPopup(popup) {
+    popup.classList.add('popup_opened');
     document.addEventListener('keydown', closeEscape);
-    evt.addEventListener('click', closeOverlay);
+    popup.addEventListener('click', closeOverlay);
 }
 
-function closePopup(evt) {
-    evt.classList.remove('popup_opened');
-    if (evt.classList.contains('popup__element') || evt.classList.contains('popup__profile')) {
-        clearPopupForm(evt);
+function closePopup(popup) {
+    popup.classList.remove('popup_opened');
+    if (popup.classList.contains('popup__element') || popup.classList.contains('popup__profile')) {
+        clearPopupForm(popup);
     }
+    document.removeEventListener('keydown', closeEscape); 
 }
 
-function clearPopupForm(evt) {
-    if (evt.classList.contains('popup__element')) {
-        evt.querySelectorAll('.popup__input').forEach(input => {
+function clearPopupForm(popup) {
+    if (popup.classList.contains('popup__element')) {
+        popup.querySelectorAll('.popup__input').forEach(input => {
             input.value = '';
         });
     }
 
-    evt.querySelector('.popup__botton').classList.add('popup__botton_disabled');
-    evt.querySelector('.popup__botton').disabled = true;
+    popup.querySelector('.popup__botton').classList.add('popup__botton_disabled');
+    popup.querySelector('.popup__botton').disabled = true;
 }
 
 function closeEscape(evt) {
