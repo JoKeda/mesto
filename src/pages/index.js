@@ -46,9 +46,11 @@ function addElement(element) {
 }
 
 //Попап карточки
+const popupCard = new PopupWithImage('.popup__image');
+
 function handleCardClick () {
-    new PopupWithImage('.popup__image').open(this._link, this._name);
-}
+    popupCard.open(this._link, this._name);
+};
 
 //Отрисовка карточек в секции при инициализации
 cardsSection.renderAll();
