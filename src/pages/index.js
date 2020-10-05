@@ -47,6 +47,7 @@ function addElement(element) {
 
 //Попап карточки
 const popupCard = new PopupWithImage('.popup__image');
+popupCard.setEventListeners();
 
 function handleCardClick () {
     popupCard.open(this._link, this._name);
@@ -59,6 +60,7 @@ cardsSection.renderAll();
 //Попап добавления карточки
 const popupAddCardButton = document.querySelector('.profile__add-button');
 const popupAddCard = new PopupWithForm('.popup__element', saveTemplate);
+popupAddCard.setEventListeners();
 
 popupAddCardButton.addEventListener('click', () => {
     popupAddCard.open();
@@ -85,6 +87,7 @@ const userInfo = new UserInfo({
 //Попап изменения данных пользователя
 const popupEditProfile = new PopupWithForm('.popup__profile', saveProfile);
 const popupEditProfileButton = document.querySelector('.profile__edit-button');
+popupEditProfile.setEventListeners();
 
 popupEditProfileButton.addEventListener('click', () => {
     const inputValues = userInfo.getUserInfo();

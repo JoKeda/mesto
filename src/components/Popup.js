@@ -2,9 +2,6 @@ export class Popup {
     constructor(selector) {
         this._popupItem = document.querySelector(selector);
         this._handleOverlayClose = this._handleOverlayClose.bind(this);
-        setTimeout(() => {
-            this._setEventListeners();
-        }, 0);
     }
 
     open() {
