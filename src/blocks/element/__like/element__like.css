@@ -8,6 +8,7 @@
     cursor: pointer;
     margin-top: 31px;
     margin-right: 18px;
+    margin-left: 18px;
     transition: opacity 1s ease-in-out;
     background-repeat: no-repeat;
 }
