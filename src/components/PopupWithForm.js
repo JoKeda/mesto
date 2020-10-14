@@ -6,6 +6,7 @@ export class PopupWithForm extends Popup {
         this._submitCallback = submitCallback;
         this.form = document.querySelector(`${selector} .popup__form`);
         this.inputs =  this.form.querySelectorAll('input');
+        this.btn = document.querySelector(`${selector} .popup__botton`);
     }
 
     getInputValues() {
@@ -19,6 +20,7 @@ export class PopupWithForm extends Popup {
 
     setEventListeners() {
         super.setEventListeners();
+
         this.form.addEventListener('submit', this._submitCallback);
     }
 

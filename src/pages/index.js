@@ -5,44 +5,106 @@ import {PopupWithForm} from "../components/PopupWithForm.js";
 import {FormValidator} from '../components/FormValidator.js';
 import {UserInfo} from "../components/UserInfo.js";
 import PopupWithImage from "../components/PopupWithImage.js";
+import {API} from "../components/API.js";
+import {PopupWithDelete} from "../components/PopupWithDelete.js";
+
+
+
+const api = new API({
+    baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-16',
+    headers: {
+        authorization: 'fcc8d5b9-93cb-49a5-813c-436684405cdf',
+        'Content-Type': 'application/json'
+    }
+});
+
+const userId = '9522e55b7d9813c7bc9619e3';
 
 //Инициализация карточек
-const cardsData = {
-    items: [
-        {
-            name: 'Архыз',
-            link: 'https://pictures.s3.yandex.net/frontend-developer/cards-compressed/arkhyz.jpg'
-        },
-        {
-            name: 'Челябинская область',
-            link: 'https://pictures.s3.yandex.net/frontend-developer/cards-compressed/chelyabinsk-oblast.jpg'
-        },
-        {
-            name: 'Иваново',
-            link: 'https://pictures.s3.yandex.net/frontend-developer/cards-compressed/ivanovo.jpg'
-        },
-        {
-            name: 'Камчатка',
-            link: 'https://pictures.s3.yandex.net/frontend-developer/cards-compressed/kamchatka.jpg'
-        },
-        {
-            name: 'Холмогорский район',
-            link: 'https://pictures.s3.yandex.net/frontend-developer/cards-compressed/kholmogorsky-rayon.jpg'
-        },
-        {
-            name: 'Байкал',
-            link: 'https://pictures.s3.yandex.net/frontend-developer/cards-compressed/baikal.jpg'
-        }
-    ],
+window.cardsData = {
+    items: [],
     renderer: addElement
 };
 
+//Информация о пользователе
+const userInfo = new UserInfo({
+    'name' : '.profile__data .profile__title',
+    'info' : '.profile__data .profile__description',
+    'avatar' : '.profile .profile__avatar'
+});
+
 //Определение секции
-const cardsSection = new Section(cardsData, '.elements');
+let cardsSection;
+
+//Попап изменения аватара
+const popupUserPicture = new PopupWithForm('.popup__avatar', updateUserPicture);
+popupUserPicture.setEventListeners();
+const popupUserPictureBtn = document.querySelector('.profile__avatar');
+
+popupUserPictureBtn.addEventListener('click', () => {
+   popupUserPicture.open();
+});
+
+Promise.all(
+    [api.getInitialCards(), api.getUserInfo()])
+    .then(([cardsDataRes, userInfoRes]) => {
+        cardsData.items = cardsDataRes;
+
+        //Загрузка и опреледеление секции
+        cardsSection = new Section(cardsData, '.elements');
+
+        //Первичная отрисовка
+        cardsSection.renderAll();
+
+        //Обновление данных пользователя
+        userInfo._name.textContent = userInfoRes.name;
+        userInfo._info.textContent = userInfoRes.about;
+        userInfo._avatar.src = userInfoRes.avatar;
+        popupUserPicture.form.querySelector('.popup__input_element_img').value = userInfoRes.avatar;
+    });
+
+
+function updateUserPicture() {
+    let inputValues = popupUserPicture.getInputValues(),
+        old_value = popupUserPicture.btn.textContent;
+
+    popupUserPicture.btn.textContent = 'Сохранение..';
+
+    api.updateUserPicture(inputValues['avatar-img'])
+        .then((res) => {
+            userInfo._avatar.src = res.avatar;
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+        .finally(() => {
+            popupUserPicture.btn.textContent = old_value;
+            popupUserPicture.close();
+        });
+}
 
 //Добавление элемента
 function addElement(element) {
-    cardsSection.addItem(new Card(element, '#element-template', handleCardClick).generateCard());
+    cardsSection.addItem(new Card(element, '#element-template', userId, {handleCardClick, handleCardDelete, handleCardLike}).generateCard());
+}
+
+
+//Клик лайка
+function handleCardLike(cardId, element) {
+    let likeNode = element.querySelector('.element__like');
+    let likeScore = element.querySelector('.element__like-score');
+
+    if (likeNode.classList.contains('element__like_active')) {
+        api.deleteLikeCard(cardId).then((res) => {
+            likeScore.textContent = res.likes.length;
+            likeNode.classList.remove('element__like_active');
+        });
+    } else {
+        api.putLikeCard(cardId).then((res) => {
+            likeScore.textContent = res.likes.length;
+            likeNode.classList.add('element__like_active');
+        });
+    }
 }
 
 //Попап карточки
@@ -51,10 +113,33 @@ popupCard.setEventListeners();
 
 function handleCardClick () {
     popupCard.open(this._link, this._name);
-};
+}
 
-//Отрисовка карточек в секции при инициализации
-cardsSection.renderAll();
+
+//Попап удаления карточки
+const popupDeleteCard = new PopupWithDelete('.popup__delete');
+popupDeleteCard.setEventListeners();
+
+function handleCardDelete(cardId, element) {
+    popupDeleteCard.open();
+
+    let old_value = popupDeleteCard.btn.textContent;
+
+    popupDeleteCard.setSubmitAction(() => {
+        popupDeleteCard.btn.textContent = 'Удаление..';
+        api.deleteCard(cardId).then(() => {
+            element.remove();
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+        .finally(() => {
+            popupDeleteCard.btn.textContent = old_value;
+            popupDeleteCard.close();
+        });
+    });
+
+}
 
 
 //Попап добавления карточки
@@ -70,19 +155,30 @@ popupAddCardButton.addEventListener('click', () => {
 function saveTemplate (evt) {
     evt.preventDefault();
     const inputValues = popupAddCard.getInputValues();
-    addElement({
-        'name' : inputValues['element-title'],
-        'link' : inputValues['element-img']
+
+    let old_value = popupAddCard.btn.textContent;
+
+    popupAddCard.btn.textContent = 'Добавление..';
+
+    api.setCard(inputValues['element-title'], inputValues['element-img'])
+        .then((response) => {
+            addElement({
+                'name' : response.name,
+                'link' : response.link,
+                'likes' : response.likes,
+                'owner' : response.owner,
+                '_id' : response._id
+            });
+        }).catch((err) => {
+            console.log(err);
+    }).finally(() => {
+        popupAddCard.btn.textContent = old_value;
+        popupAddCard.close();
     });
-    popupAddCard.close();
+
+
 }
 
-
-//Информация о пользователе
-const userInfo = new UserInfo({
-    'name' : '.profile__data .profile__title',
-    'info' : '.profile__data .profile__description'
-});
 
 //Попап изменения данных пользователя
 const popupEditProfile = new PopupWithForm('.popup__profile', saveProfile);
@@ -100,8 +196,20 @@ popupEditProfileButton.addEventListener('click', () => {
 function saveProfile (evt) {
     evt.preventDefault();
     const inputValues = popupEditProfile.getInputValues();
-    userInfo.setUserInfo(inputValues['title'], inputValues['description']);
-    popupEditProfile.close();
+
+    let old_value = popupEditProfile.btn.textContent;
+
+    popupEditProfile.btn.textContent = 'Сохранение..';
+
+    userInfo
+        .setUserInfo(inputValues['title'], inputValues['description'])
+        .catch((err) => {
+        console.log(err);
+    }).finally(() => {
+        popupEditProfile.btn.textContent = old_value;
+        popupEditProfile.close();
+    });
+
 }
 
 //Валидация
@@ -117,6 +225,8 @@ const custom = {
 
 const userValidator = new FormValidator(custom, popupEditProfile.form);
 const popupAddCardValidator = new FormValidator(custom, popupAddCard.form);
+const popupUserPictureValidator = new FormValidator(custom, popupUserPicture.form);
 
+popupUserPictureValidator.enableValidation();
 userValidator.enableValidation();
 popupAddCardValidator.enableValidation();
