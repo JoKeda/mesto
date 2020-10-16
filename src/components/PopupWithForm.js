@@ -7,6 +7,7 @@ export class PopupWithForm extends Popup {
         this.form = document.querySelector(`${selector} .popup__form`);
         this.inputs =  this.form.querySelectorAll('input');
         this.btn = document.querySelector(`${selector} .popup__botton`);
+        this.err = document.querySelector(`${selector} .popup__error`);
     }
 
     getInputValues() {
@@ -28,6 +29,8 @@ export class PopupWithForm extends Popup {
         this.inputs.forEach(function (item) {
             item.value = '';
         });
+        this.err.textContent = '';
+        this.err.classList.remove('popup__error_visible');
         this.form.querySelector('.popup__botton').classList.add('popup__botton_disabled');
         super.close();
     }

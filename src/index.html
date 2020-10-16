@@ -40,6 +40,7 @@
     <div class="popup popup__element">
         <form class="popup__form" name="popup__form">
             <h3 class="popup__title">Новое место</h3>
+            <span class="popup__error" id="global-add-error"></span>
             <input class="popup__input popup__input_element_element-title" type="text" name="element-title" placeholder="Название" minlength="1" maxlength="30" required>
             <span class="popup__error" id="error-element-title"></span>
             <input class="popup__input popup__input_element_img" type="url" name="element-img" placeholder="Ссылка на картинку" required>
@@ -60,6 +61,7 @@
     <div class="popup popup__delete">
         <form class="popup__form" name="popup__form">
             <h3 class="popup__title">Вы уверены?</h3>
+            <span class="popup__error" id="error-img"></span>
             <button class="popup__botton" type="submit">Да</button>
             <button class="popup__close" type="button"></button>
         </form>

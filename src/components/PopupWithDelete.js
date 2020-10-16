@@ -6,6 +6,7 @@ export class PopupWithDelete extends Popup {
         this.form = this._popupItem.querySelector(".popup__form");
         this._submitCallback = submitCallback;
         this.btn = document.querySelector(`${selector} .popup__botton`);
+        this.err = document.querySelector(`${selector} .popup__error`);
     }
 
     setSubmitAction(callback) {
@@ -13,5 +14,11 @@ export class PopupWithDelete extends Popup {
             evt.preventDefault();
             callback();
         });
+    }
+
+    close() {
+        this.err.textContent = '';
+        this.err.classList.remove('popup__error_visible');
+        super.close();
     }
 }

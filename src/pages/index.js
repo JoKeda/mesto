@@ -21,7 +21,7 @@ const api = new API({
 const userId = '9522e55b7d9813c7bc9619e3';
 
 //Инициализация карточек
-window.cardsData = {
+let cardsData = {
     items: [],
     renderer: addElement
 };
@@ -36,14 +36,6 @@ const userInfo = new UserInfo({
 //Определение секции
 let cardsSection;
 
-//Попап изменения аватара
-const popupUserPicture = new PopupWithForm('.popup__avatar', updateUserPicture);
-popupUserPicture.setEventListeners();
-const popupUserPictureBtn = document.querySelector('.profile__avatar');
-
-popupUserPictureBtn.addEventListener('click', () => {
-   popupUserPicture.open();
-});
 
 Promise.all(
     [api.getInitialCards(), api.getUserInfo()])
@@ -54,16 +46,45 @@ Promise.all(
         cardsSection = new Section(cardsData, '.elements');
 
         //Первичная отрисовка
-        cardsSection.renderAll();
+        cardsSection.renderAllFirstTime(addElementFistTime);
 
         //Обновление данных пользователя
-        userInfo._name.textContent = userInfoRes.name;
-        userInfo._info.textContent = userInfoRes.about;
-        userInfo._avatar.src = userInfoRes.avatar;
+        userInfo.setUserInfo(userInfoRes.name, userInfoRes.about);
+        userInfo.setUserPicture(userInfoRes.avatar);
         popupUserPicture.form.querySelector('.popup__input_element_img').value = userInfoRes.avatar;
+
+
+        //Добавление слушателей событий открытия форм
+
+        popupEditProfileButton.addEventListener('click', () => {
+            const inputValues = userInfo.getUserInfo();
+            popupEditProfile.form.querySelector('input[name=title]').value = inputValues['name'];
+            popupEditProfile.form.querySelector('input[name=description]').value = inputValues['info'];
+            userValidator.resetForm();
+            popupEditProfile.open();
+        });
+
+        popupAddCardButton.addEventListener('click', () => {
+            popupAddCardValidator.resetForm();
+            popupAddCard.open();
+        });
+
+        popupUserPictureBtn.addEventListener('click', () => {
+            popupUserPicture.form.querySelector('input[name=avatar-img]').value = userInfo.getUserPicture().src;
+            popupUserPictureValidator.resetForm();
+            popupUserPicture.open();
+        });
+
+    }).catch((err) => {
+        console.log(err);
     });
 
+//Попап изменения аватара
+const popupUserPicture = new PopupWithForm('.popup__avatar', updateUserPicture);
+const popupUserPictureBtn = document.querySelector('.profile__avatar');
 
+
+//Обновление фотографии профиля
 function updateUserPicture() {
     let inputValues = popupUserPicture.getInputValues(),
         old_value = popupUserPicture.btn.textContent;
@@ -74,12 +95,14 @@ function updateUserPicture() {
         .then((res) => {
             userInfo._avatar.src = res.avatar;
         })
-        .catch((err) => {
-            console.log(err);
-        })
-        .finally(() => {
+        .then(() => {
             popupUserPicture.btn.textContent = old_value;
             popupUserPicture.close();
+        })
+        .catch((err) => {
+            popupUserPicture.err.classList.add('popup__error_visible');
+            popupUserPicture.btn.textContent = old_value;
+            popupUserPicture.err.textContent = err;
         });
 }
 
@@ -88,28 +111,34 @@ function addElement(element) {
     cardsSection.addItem(new Card(element, '#element-template', userId, {handleCardClick, handleCardDelete, handleCardLike}).generateCard());
 }
 
+//Первичное добавление элемента
+function addElementFistTime(element) {
+    cardsSection.addItemFirstTime(new Card(element, '#element-template', userId, {handleCardClick, handleCardDelete, handleCardLike}).generateCard());
+}
+
 
 //Клик лайка
-function handleCardLike(cardId, element) {
-    let likeNode = element.querySelector('.element__like');
-    let likeScore = element.querySelector('.element__like-score');
-
+function handleCardLike(cardId, likeNode, likeScore) {
     if (likeNode.classList.contains('element__like_active')) {
         api.deleteLikeCard(cardId).then((res) => {
             likeScore.textContent = res.likes.length;
             likeNode.classList.remove('element__like_active');
+        }).catch((err) => {
+            console.log(err);
         });
     } else {
         api.putLikeCard(cardId).then((res) => {
             likeScore.textContent = res.likes.length;
             likeNode.classList.add('element__like_active');
+        }).catch((err) => {
+            console.log(err);
         });
     }
 }
 
 //Попап карточки
 const popupCard = new PopupWithImage('.popup__image');
-popupCard.setEventListeners();
+
 
 function handleCardClick () {
     popupCard.open(this._link, this._name);
@@ -118,7 +147,7 @@ function handleCardClick () {
 
 //Попап удаления карточки
 const popupDeleteCard = new PopupWithDelete('.popup__delete');
-popupDeleteCard.setEventListeners();
+
 
 function handleCardDelete(cardId, element) {
     popupDeleteCard.open();
@@ -130,12 +159,13 @@ function handleCardDelete(cardId, element) {
         api.deleteCard(cardId).then(() => {
             element.remove();
         })
-        .catch((err) => {
-            console.log(err);
-        })
-        .finally(() => {
+        .then(() => {
             popupDeleteCard.btn.textContent = old_value;
             popupDeleteCard.close();
+        }).catch((err) => {
+            popupDeleteCard.err.textContent = err;
+            popupDeleteCard.err.classList.add('popup__error_visible');
+            popupDeleteCard.btn.textContent = old_value;
         });
     });
 
@@ -145,11 +175,7 @@ function handleCardDelete(cardId, element) {
 //Попап добавления карточки
 const popupAddCardButton = document.querySelector('.profile__add-button');
 const popupAddCard = new PopupWithForm('.popup__element', saveTemplate);
-popupAddCard.setEventListeners();
 
-popupAddCardButton.addEventListener('click', () => {
-    popupAddCard.open();
-});
 
 //Коллбек сабмита формы
 function saveTemplate (evt) {
@@ -169,12 +195,16 @@ function saveTemplate (evt) {
                 'owner' : response.owner,
                 '_id' : response._id
             });
-        }).catch((err) => {
-            console.log(err);
-    }).finally(() => {
-        popupAddCard.btn.textContent = old_value;
-        popupAddCard.close();
-    });
+        })
+        .then(() => {
+            popupAddCard.btn.textContent = old_value;
+            popupAddCard.close();
+        })
+        .catch((err) => {
+            popupAddCard.err.textContent = err;
+            popupAddCard.err.classList.add('popup__error_visible');
+            popupAddCard.btn.textContent = old_value;
+        });
 
 
 }
@@ -183,14 +213,7 @@ function saveTemplate (evt) {
 //Попап изменения данных пользователя
 const popupEditProfile = new PopupWithForm('.popup__profile', saveProfile);
 const popupEditProfileButton = document.querySelector('.profile__edit-button');
-popupEditProfile.setEventListeners();
 
-popupEditProfileButton.addEventListener('click', () => {
-    const inputValues = userInfo.getUserInfo();
-    popupEditProfile.form.querySelector('input[name=title]').value = inputValues['name'];
-    popupEditProfile.form.querySelector('input[name=description]').value = inputValues['info'];
-    popupEditProfile.open();
-});
 
 //Коллбек сохранения профиля
 function saveProfile (evt) {
@@ -201,16 +224,25 @@ function saveProfile (evt) {
 
     popupEditProfile.btn.textContent = 'Сохранение..';
 
-    userInfo
-        .setUserInfo(inputValues['title'], inputValues['description'])
-        .catch((err) => {
-        console.log(err);
-    }).finally(() => {
-        popupEditProfile.btn.textContent = old_value;
-        popupEditProfile.close();
-    });
+    api.setUserInfo(inputValues['title'], inputValues['description'])
+        .then((res) => {
+            userInfo.setUserInfo(res.name, res.about);
+            popupEditProfile.btn.textContent = old_value;
+            popupEditProfile.close();
+        }).catch((err) => {
+            popupEditProfile.err.textContent = err;
+            popupEditProfile.err.classList.add('popup__error_visible');
+            popupEditProfile.btn.textContent = old_value;
+        });
 
 }
+
+//Добавление слушателей событий модальных окон
+popupUserPicture.setEventListeners();
+popupCard.setEventListeners();
+popupDeleteCard.setEventListeners();
+popupEditProfile.setEventListeners();
+popupAddCard.setEventListeners();
 
 //Валидация
 const custom = {
